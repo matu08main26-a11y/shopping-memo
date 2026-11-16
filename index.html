@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#28664f"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.png"><title>買い物メモ</title><style>*{box-sizing:border-box}
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#355d4b"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.png"><title>買い物メモ</title><style>*{box-sizing:border-box}
 :root{color-scheme:light;--green:#28664f;--line:#d7e1d9}
 body{margin:0;background:#f5f7f3;color:#202d24;font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 main{max-width:680px;margin:auto;padding:20px 16px 140px;min-width:0}
@@ -74,7 +74,66 @@ summary{min-height:44px;cursor:pointer;font-weight:600;line-height:1.5;overflow-
 .presets button{width:100%;text-align:left;margin-top:8px}
 #offerlinks .link-button,#formlinks .link-button{width:100%;margin-top:8px}
 @media(max-width:360px){main{padding:16px 12px 150px}dialog{padding:16px}.offer{padding:10px 8px}.offer strong{font-size:20px}header button{padding:10px}.name{font-size:17px}}
-textarea{font:inherit;min-height:88px;resize:vertical}label textarea{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;margin-top:7px;padding:12px;border:1px solid #b9c9bd;border-radius:9px;background:#fff;color:inherit;font-size:16px;font-weight:400}textarea:focus-visible{outline:3px solid #b57516;outline-offset:2px}.product-note{white-space:pre-wrap;overflow-wrap:anywhere;background:#faf6e9;border-left:3px solid #c9ab5d;border-radius:6px;margin-top:12px;padding:8px 10px;font-size:14px;line-height:1.65}.done .product-note{background:#f0f1e8} </style></head><body><main><header><h1>買い物メモ<span class="small block">商品メモ対応版 v7</span></h1><button id="history">購入履歴</button><button id="flyers">店舗・チラシ</button><button id="settings">設定</button></header><nav id="tabs" aria-label="買い物予定日"></nav><div id="list"></div></main><footer><div><span id="total" class="small" aria-live="polite"></span><button id="add" class="primary">＋ 商品を追加</button></div></footer><dialog id="modal" aria-label="買い物メモの操作"></dialog><script>'use strict';
+:root{--green:#355d4b;--line:#e0e6e1}
+body{background:#f7f8f5;color:#27382d}
+main{max-width:680px;padding-top:14px;padding-bottom:100px}
+.compact-header{position:relative;display:flex;flex-wrap:nowrap;gap:12px;align-items:center;min-height:46px}
+.compact-header h1{flex:1 1 auto;font-size:21px;margin:0;letter-spacing:.01em}
+.version{display:inline-block;margin-left:8px;font-size:10px;font-weight:400;color:#79867d;vertical-align:middle}
+.app-menu{position:static;flex:none}
+.app-menu>summary{list-style:none;display:grid;place-items:center;font-size:21px;width:44px;height:44px;min-height:44px;border:1px solid var(--line);border-radius:12px;color:#405b49;background:#fff}
+.app-menu>summary::-webkit-details-marker{display:none}
+.app-menu:not([open]) .menu-items{display:none}
+.menu-items{display:flex;justify-content:flex-end;gap:4px;position:absolute;right:0;top:52px;z-index:5;padding:6px;max-width:calc(100vw - 32px);border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 6px 22px #1f382014}
+.menu-items button{font-size:14px;white-space:nowrap;background:transparent}
+nav{padding:12px 0;gap:6px;background:#f7f8f5}
+nav button{background:transparent;border-radius:20px;padding:8px 14px;font-size:14px;border:1px solid var(--line);min-height:40px}
+nav button.primary{background:var(--green);border-color:var(--green)}
+.list-tools{display:flex;justify-content:space-between;align-items:center;gap:4px;margin:0 0 8px;color:#728076;font-size:12px;flex-wrap:wrap}
+.list-tools>div{display:flex;gap:4px}
+.list-tools button{font-size:12px;padding:8px;background:transparent;color:#526858;min-height:44px}
+.memo-row{padding:0;margin:0;border:0;border-bottom:1px solid #e4e9e2;border-radius:0;background:transparent;min-width:0}
+.compact-row{display:flex;align-items:center;gap:0;min-height:64px}
+.check-hit{margin:0;display:grid;place-items:center;flex:0 0 40px;min-width:40px;height:48px;cursor:pointer}
+.check-hit input{width:22px;height:22px;min-height:22px;margin:0;padding:0;accent-color:var(--green)}
+.row-toggle{display:flex;flex:1;gap:10px;align-items:center;text-align:left;background:transparent;padding:10px 0 10px 5px;min-width:0;color:inherit;border-radius:6px;min-height:64px}
+.row-name{flex:1;min-width:0;font-size:16px;font-weight:550;overflow-wrap:anywhere;line-height:1.4}
+.row-price{display:flex;flex-direction:column;align-items:flex-end;flex:0 1 44%;min-width:0;text-align:right;line-height:1.35;gap:3px}
+.row-price strong{font-size:17px;font-weight:650;font-variant-numeric:tabular-nums}
+.row-shop{font-size:10px;color:#78857b;overflow-wrap:anywhere;max-width:100%}
+.note-preview{font-size:11px;font-weight:400;color:#7d7561;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chevron{flex:none;width:19px;text-align:center;color:#88988b;font-size:16px}
+.row-detail[hidden]{display:none}
+.row-detail{padding:0 12px 14px 45px}
+.memo-row.is-open{background:#fff;border-radius:10px;margin:4px 0;border:1px solid var(--line)}
+.memo-row.done{background:#eef0eb}
+.done .row-name{text-decoration:line-through;color:#829085}
+.done .row-price strong{color:#7c897f}
+.row-detail .offers{margin-top:4px;gap:8px}
+.row-detail .offer{background:#f5f7f3;padding:10px;border-radius:9px}
+.row-detail .offer.selected{background:#edf3ed;border-color:#799781}
+.row-detail .offer.best{color:#355d4b}
+.row-detail .offer>span:first-child{font-size:12px;display:block}
+.row-detail .offer strong{font-size:19px;margin-top:4px}
+.row-detail .badge{font-size:10px;min-height:14px;margin-top:4px}
+.row-detail .offer-edit{font-size:11px;text-decoration:none;color:#7a827c;margin:0;min-height:40px;padding:8px 0}
+.row-detail .offer-wrap .link-button{min-height:36px;font-size:11px;justify-content:center;background:transparent;color:#607969;text-decoration:underline;padding:6px}
+.compare-label{font-size:11px;margin:0 0 7px;font-weight:400;color:#7a877d}
+.product-note{white-space:pre-wrap;overflow-wrap:anywhere;border-left:2px solid #b2b9a4;background:#f6f6ef;border-radius:0 6px 6px 0;padding:8px 10px;margin-top:10px;font-size:13px;line-height:1.6;color:#5a6053}
+.product-note>.small{font-size:10px;margin:0 0 2px;color:#8a8e7f}
+.detail-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px}
+.detail-actions button{width:auto;min-height:40px;margin:0;font-size:12px;padding:8px 10px;border:0;background:transparent;color:#597563}
+.detail-actions .item-edit{margin-left:auto;color:#7d887f}
+.reorder-actions{margin:0 12px 8px 45px;gap:4px}
+.reorder-actions button{min-height:36px;flex-basis:40px;padding:4px}
+footer{border:0;background:linear-gradient(transparent,#f7f8f5 35%);padding-top:22px}
+footer>div{justify-content:flex-end}
+footer button{flex:0 1 auto;border-radius:24px;padding:11px 22px;box-shadow:0 3px 12px #23452b16;font-size:14px}
+textarea{font:inherit;min-height:82px;resize:vertical}
+label textarea{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;margin-top:7px;padding:12px;border:1px solid #b9c9bd;border-radius:9px;background:#fff;color:inherit;font-size:16px;font-weight:400}
+textarea:focus-visible{outline:3px solid #b57516;outline-offset:2px}
+@media(max-width:360px){main{padding-left:10px;padding-right:10px}.version{font-size:9px;margin-left:5px}.compact-header h1{font-size:20px}.row-detail{padding-left:30px}.row-name{font-size:15px}.row-price strong{font-size:16px}.row-toggle{gap:6px}.menu-items button{padding:9px}}
+</style></head><body><main><header class="compact-header"><h1>買い物メモ<span class="version">一覧版 v8</span></h1><details id="appmenu" class="app-menu"><summary aria-label="履歴・店舗・設定メニュー">☰</summary><div class="menu-items"><button id="history">履歴</button><button id="flyers">店舗・チラシ</button><button id="settings">設定</button></div></details></header><nav id="tabs" aria-label="買い物予定日"></nav><div id="list"></div></main><footer><div><button id="add" class="primary">＋ 商品を追加</button></div></footer><dialog id="modal" aria-label="買い物メモの操作"></dialog><script>'use strict';
 const $=s=>document.querySelector(s);
 const key='shopping-memo-v1';
 const uid=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2);
@@ -133,23 +192,22 @@ function close(){$('#modal').close()}
 function actions(label='保存'){return '<div class="actions"><button type="button" data-close>取消</button><button class="primary">'+label+'</button></div>'}
 function shopOptions(chosen,shops=db.shops){return shops.map(s=>'<option value="'+esc(s.id)+'" '+(s.id===chosen?'selected':'')+'>'+esc(s.name)+'</option>').join('')}
 function pageLink(url,text){const u=safeURL(url);return u?'<a class="link-button" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(text)+'</a>':''}
+let expanded=new Set();
 function render(){
  const ms=db.dailyMemos.filter(m=>m.date===active);
  $('#tabs').innerHTML=[...db.memoDates].sort().map(d=>'<button data-day="'+esc(d)+'" class="'+(d===active?'primary':'')+'">'+esc(d.slice(5).replace('-','/'))+'</button>').join('')+'<button id="newday">＋ 日付</button>';
- $('#list').innerHTML='<div class="date-tools"><strong>'+esc(active)+' の買い物</strong><button id="reorder" aria-pressed="'+reordering+'">'+(reordering?'並び替え完了':'↕ 並び替え')+'</button></div>'+(reordering?'<p class="small">↑ ↓ で買い物する順に並べられます。</p>':'')+(ms.length&&ms.every(m=>m.done)?'<button id="deleteday" class="danger delete-day">この日のメモを削除</button>':'')+
+ const allOpen=ms.length>0&&ms.every(m=>expanded.has(m.id));
+ $('#list').innerHTML='<div class="list-tools"><span>'+ms.filter(m=>!m.done).length+' / '+ms.length+' 点 未購入</span><div><button id="allfold" '+(!ms.length?'disabled':'')+'>'+(allOpen?'一覧に戻す':'すべて開く')+'</button><button id="reorder" aria-pressed="'+reordering+'">'+(reordering?'並び替え完了':'並び替え')+'</button></div></div>'+(reordering?'<p class="small">↑ ↓ で買い物する順に並べられます。</p>':'')+(ms.length&&ms.every(m=>m.done)?'<button id="deleteday" class="danger delete-day">この日のメモを削除</button>':'')+
  (ms.map((m,index)=>{
-  const os=memoOffers(m),ps=os.filter(o=>o.price!==null).map(o=>o.price),min=ps.length?Math.min(...ps):null;
-  const h=db.history.filter(h=>norm(h.name)===norm(m.name)).sort((a,b)=>b.date.localeCompare(a.date)||(b.time||0)-(a.time||0))[0];
-  const chosen=selected(m);
-  return '<article class="'+(m.done?'done':'')+'"><div class="line"><input type="checkbox" data-check="'+esc(m.id)+'" aria-label="'+esc(m.name)+'を購入済みにする" '+(m.done?'checked':'')+'><div class="item"><div class="name">'+esc(m.name)+(m.done?' ✓ 購入済み':'')+'</div><div class="small">前回購入：'+(h?esc(h.date)+' · '+esc(h.shopName):'なし')+'</div></div><button data-edit="'+esc(m.id)+'">編集</button></div>'+(m.note?'<div class="product-note"><span class="small block">メモ</span>'+esc(m.note)+'</div>':'')+ 
+  const open=expanded.has(m.id),os=memoOffers(m),ps=os.filter(o=>o.price!==null).map(o=>o.price),min=ps.length?Math.min(...ps):null,chosen=selected(m);
+  return '<article class="memo-row '+(m.done?'done ':'')+(open?'is-open':'')+'"><div class="compact-row"><label class="check-hit"><input type="checkbox" data-check="'+esc(m.id)+'" aria-label="'+esc(m.name)+'を購入済みにする" '+(m.done?'checked':'')+'></label><button class="row-toggle" data-expand="'+esc(m.id)+'" aria-expanded="'+open+'" aria-controls="detail-'+esc(m.id)+'"><span class="row-name">'+esc(m.name)+'</span><span class="row-price"><strong>'+yen(chosen?.price??null)+'</strong><span class="row-shop">'+esc(chosen?.name||'購入先未選択')+'</span>'+(!open&&m.note?'<span class="note-preview">'+esc(m.note)+'</span>':'')+'</span><span class="chevron" aria-hidden="true">'+(open?'⌃':'⌄')+'</span></button></div>'+
   (reordering?'<div class="actions reorder-actions"><span>'+(index+1)+'番目</span><button data-itemmove="'+esc(m.id)+'" data-step="-1" aria-label="'+esc(m.name)+'を上へ" '+(!index?'disabled':'')+'>↑</button><button data-itemmove="'+esc(m.id)+'" data-step="1" aria-label="'+esc(m.name)+'を下へ" '+(index===ms.length-1?'disabled':'')+'>↓</button></div>':'')+
-  (ps.length>1?'<div class="small compare-label">今回登録した店舗の価格を比較</div>':'')+
-  '<div class="offers '+(os.length===1?'single':'')+'">'+os.map(o=>'<div class="offer-wrap"><button class="offer '+(o.shop===m.shop?'selected ':'')+(ps.length>1&&o.price===min?'best':'')+'" data-choose="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" '+(m.done?'disabled':'')+'>'+esc(o.name)+'<strong>'+yen(o.price)+'</strong><span class="badge">'+(o.shop===m.shop?'✓ 購入先 ':'')+(ps.length>1&&o.price===min?'最安値':'')+'</span></button>'+(!m.done?'<button class="offer-edit" data-offeredit="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'">価格の編集・削除</button>':'')+'</div>').join('')+'</div>'+
-  (!m.done?'<button class="add-offer" data-offeradd="'+esc(m.id)+'">＋ 店舗の価格</button>':'')+
-  '<div class="small">購入先：'+esc(chosen?.name||'未選択')+' · '+yen(chosen?.price??null)+'</div></article>'
+  '<div id="detail-'+esc(m.id)+'" class="row-detail" '+(!open?'hidden':'')+'>'+
+  (ps.length>1?'<div class="small compare-label">店舗の価格を比較</div>':'')+
+  '<div class="offers '+(os.length===1?'single':'')+'">'+os.map(o=>'<div class="offer-wrap"><button class="offer '+(o.shop===m.shop?'selected ':'')+(ps.length>1&&o.price===min?'best':'')+'" data-choose="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" '+(m.done?'disabled':'')+'><span>'+esc(o.name)+'</span><strong>'+yen(o.price)+'</strong><span class="badge">'+(o.shop===m.shop?'✓ ':'')+(ps.length>1&&o.price===min?'最安値':'')+'</span></button>'+(!m.done?'<button class="offer-edit" data-offeredit="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'">編集・削除</button>':'')+pageLink(o.url,'チラシ')+'</div>').join('')+'</div>'+
+  (m.note?'<div class="product-note"><span class="small block">メモ</span>'+esc(m.note)+'</div>':'')+
+  '<div class="detail-actions">'+(!m.done?'<button class="add-offer" data-offeradd="'+esc(m.id)+'">＋ 店舗の価格</button>':'')+'<button class="item-edit" data-edit="'+esc(m.id)+'">商品を編集</button></div></div></article>'
  }).join('')||'<div class="empty">この日の商品を追加しましょう</div>');
- const pending=ms.filter(m=>!m.done),unknown=pending.filter(m=>selected(m)?.price==null).length;
- $('#total').textContent='未購入 '+pending.length+'点 · '+yen(pending.reduce((s,m)=>s+(selected(m)?.price||0),0))+(unknown?'（価格未登録 '+unknown+'点）':'');
  $('#add').disabled=loadError;
 }
 function candidates(){const names=[...db.dailyMemos.map(m=>m.name),...db.history.slice().reverse().map(h=>h.name),...db.items.map(i=>i.name)],seen=new Set();return names.filter(n=>{const k=norm(n);if(!k||seen.has(k))return false;seen.add(k);return true})}
@@ -165,7 +223,7 @@ function edit(m){
  if(!db.shops.length){alert('まず店舗を追加しましょう');shopEdit();return}
  if(m?.done){modal('<form id="noteform"><h2>購入済みの商品</h2><p>'+esc(m.name)+'</p><label>商品メモ（任意）<textarea name="note" maxlength="1000" rows="3" placeholder="容量、個数、クーポン、代替品など">'+esc(m.note||'')+'</textarea></label><p class="small">商品メモは購入済みでも変更できます。価格などを変更する場合は、一覧のチェックを外してください。</p>'+actions('メモを保存')+'<div class="actions"><button type="button" class="danger" data-deletememo="'+esc(m.id)+'">この商品をメモから削除</button></div></form>');$('#noteform').onsubmit=e=>{e.preventDefault();m.note=$('#noteform').elements.namedItem('note').value.trim().slice(0,1000);close();save()};return}
 
- modal('<form id="form" autocomplete="off"><h2>'+(m?'商品を編集':'商品を追加')+'</h2><div id="name-wrap"><label>商品名<input name="name" required maxlength="100" autocomplete="off" value="'+esc(m?.name||'')+'"></label><div id="suggestions" class="suggestions" hidden></div></div><label>価格（円・空欄可）<input name="price" type="number" min="0" step="1" inputmode="numeric" placeholder="例：198" value="'+(m?selected(m)?.price??'':'')+'"></label><label>店舗<select name="shop" '+(m&&db.shops.some(s=>s.id===m.shop)?'disabled':'')+'>'+shopOptions(m?.shop)+'</select></label><div id="formlinks"></div>'+(m?'<p class="small">別店舗の追加は、商品カードの「＋ 店舗の価格」からできます。</p>':'')+'<label>買い物予定日<input name="day" type="date" required value="'+esc(m?.date||active)+'"></label><label>商品メモ（任意）<textarea name="note" maxlength="1000" rows="3" placeholder="容量、個数、クーポン、代替品など">'+esc(m?.note||'')+'</textarea></label>'+actions()+(m?'<div class="actions"><button type="button" class="danger" data-deletememo="'+esc(m.id)+'">この商品をメモから削除</button></div>':'')+'</form>');
+ modal('<form id="form" autocomplete="off"><h2>'+(m?'商品を編集':'商品を追加')+'</h2><div id="name-wrap"><label>商品名<input name="name" required maxlength="100" autocomplete="off" value="'+esc(m?.name||'')+'"></label><div id="suggestions" class="suggestions" hidden></div></div><label>価格（円・空欄可）<input name="price" type="number" min="0" step="1" inputmode="numeric" placeholder="例：198" value="'+(m?selected(m)?.price??'':'')+'"></label><label>商品メモ（任意）<textarea name="note" maxlength="1000" rows="3" placeholder="容量、個数、クーポン、代替品など">'+esc(m?.note||'')+'</textarea></label><label>店舗<select name="shop" '+(m&&db.shops.some(s=>s.id===m.shop)?'disabled':'')+'>'+shopOptions(m?.shop)+'</select></label><div id="formlinks"></div>'+(m?'<p class="small">別店舗の追加は、商品カードの「＋ 店舗の価格」からできます。</p>':'')+'<label>買い物予定日<input name="day" type="date" required value="'+esc(m?.date||active)+'"></label>'+actions()+(m?'<div class="actions"><button type="button" class="danger" data-deletememo="'+esc(m.id)+'">この商品をメモから削除</button></div>':'')+'</form>');
  const f=$('#form'),field=n=>f.elements.namedItem(n);attachSuggestions(field('name'));
  const storeLinks=$('#formlinks');
  const updateStoreLink=()=>{storeLinks.innerHTML=pageLink(db.shops.find(s=>s.id===field('shop').value)?.url,'この店舗のチラシ・公式ページを開く')};field('shop').onchange=updateStoreLink;updateStoreLink();
@@ -217,8 +275,8 @@ function presetEdit(index){const p=presets[index];if(!p)return;modal('<form id="
 function download(content,name){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function newday(){modal('<form id="dayform"><h2>買い物の日付を追加</h2><label>買い物予定日<input name="day" type="date" required value="'+today()+'"></label>'+actions('追加')+'</form>');const f=$('#dayform');f.onsubmit=e=>{e.preventDefault();const day=f.elements.namedItem('day').value;if(!validDate(day))return;if(!db.memoDates.includes(day))db.memoDates.push(day);active=day;reordering=false;close();save()}}
 document.addEventListener('click',e=>{
- const b=e.target.closest('button');if(!b)return;const d=b.dataset,m=db.dailyMemos.find(m=>m.id===(d.edit||d.deletememo||d.offeradd||d.offeredit||d.offerremove||d.choose));
- if('close'in d)close();
+ const b=e.target.closest('button');if(!b)return;if(['history','flyers','settings'].includes(b.id)&&$('#appmenu'))$('#appmenu').open=false;const d=b.dataset,m=db.dailyMemos.find(m=>m.id===(d.edit||d.deletememo||d.offeradd||d.offeredit||d.offerremove||d.choose));
+ if(d.expand){expanded.has(d.expand)?expanded.delete(d.expand):expanded.add(d.expand);render()}else if(b.id==='allfold'){const ms=db.dailyMemos.filter(m=>m.date===active),all=ms.every(m=>expanded.has(m.id));ms.forEach(m=>all?expanded.delete(m.id):expanded.add(m.id));render()}else if('close'in d)close();
  else if(d.day){active=d.day;reordering=false;render()}
  else if(d.edit)edit(m);
  else if(d.offeradd)offerEdit(m);
