@@ -133,7 +133,37 @@ textarea{font:inherit;min-height:82px;resize:vertical}
 label textarea{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;margin-top:7px;padding:12px;border:1px solid #b9c9bd;border-radius:9px;background:#fff;color:inherit;font-size:16px;font-weight:400}
 textarea:focus-visible{outline:3px solid #b57516;outline-offset:2px}
 @media(max-width:360px){main{padding-left:10px;padding-right:10px}.version{font-size:9px;margin-left:5px}.compact-header h1{font-size:20px}.row-detail{padding-left:30px}.row-name{font-size:15px}.row-price strong{font-size:16px}.row-toggle{gap:6px}.menu-items button{padding:9px}}
-</style></head><body><main><header class="compact-header"><h1>買い物メモ<span class="version">一覧版 v8</span></h1><details id="appmenu" class="app-menu"><summary aria-label="履歴・店舗・設定メニュー">☰</summary><div class="menu-items"><button id="history">履歴</button><button id="flyers">店舗・チラシ</button><button id="settings">設定</button></div></details></header><nav id="tabs" aria-label="買い物予定日"></nav><div id="list"></div></main><footer><div><button id="add" class="primary">＋ 商品を追加</button></div></footer><dialog id="modal" aria-label="買い物メモの操作"></dialog><script>'use strict';
+#storetabs{position:static;padding:0;gap:16px;border-bottom:1px solid var(--line);margin-bottom:4px;scrollbar-width:thin}
+#storetabs button{background:transparent;border:0;border-radius:0;padding:8px 2px;min-height:44px;color:#758278;border-bottom:2px solid transparent;font-size:13px}
+#storetabs button[aria-pressed=true]{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+#tabs{position:static;padding-bottom:6px}
+.compare-header{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;color:#78877d;font-size:11px}
+.compare-header .price-add{font-size:12px;color:var(--green);padding-right:0;min-height:44px}
+.price-card{position:relative;border:1px solid transparent;border-radius:10px;background:#f0f3ef;min-width:0;padding:4px}
+.price-card.selected{border-color:#799781;background:#eaf1e9}
+.price-pick{display:flex;flex-direction:column;text-align:left;gap:8px;width:100%;min-height:112px;padding:10px;background:transparent}
+.price-pick>span:first-child{font-size:12px;padding-right:24px;overflow-wrap:anywhere}
+.price-pick strong{font-size:26px;font-weight:600;color:#355d4b;overflow-wrap:anywhere}
+.price-pick .badge{min-height:15px;font-size:10px;margin:0}
+.price-pick:disabled{opacity:.8}
+.price-pencil{position:absolute;top:0;right:0;min-height:44px;width:44px;padding:8px;color:#7a9280;background:transparent;font-size:19px}
+.memo-edit{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;width:100%;border-radius:9px;background:#f2f3eb;padding:11px 12px;margin-top:12px;font-size:13px;line-height:1.6}
+.memo-edit>span:first-child{min-width:0;flex:1}
+.memo-label{display:block;font-size:11px;color:#949b8a;margin-bottom:5px}
+.memo-text{display:block}
+.memo-edit>span:last-child{color:#8b957f;flex:none}
+.memo-edit.empty-note{background:transparent;color:#8a9387}
+.other-line{display:flex;justify-content:flex-end;margin-top:17px;padding-top:7px;border-top:1px solid var(--line)}
+.other-line button{font-size:12px;color:#728477;background:transparent}
+.complete-day{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;color:#5f7c67;font-size:13px}
+.complete-day button{font-size:11px;background:transparent;color:#7c887e}
+.separate-choice{font-size:13px;font-weight:400;display:flex;align-items:center;gap:8px}
+.separate-choice input{width:20px;height:20px;min-height:20px;margin:0;flex:none;accent-color:var(--green)}
+#duplicateinfo:not(:empty){padding:10px;background:#f0f4eb;border-radius:8px}
+#notice{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);width:max-content;max-width:90vw;background:#355d4b;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;z-index:5}
+#notice[hidden]{display:none}
+@media(max-width:360px){.price-pick strong{font-size:23px}.row-detail{padding-left:28px;padding-right:9px}#storetabs{gap:13px}}
+</style></head><body><main><header class="compact-header"><h1>買い物メモ<span class="version">店舗タブ版 v9</span></h1><details id="appmenu" class="app-menu"><summary aria-label="履歴・店舗・設定メニュー">☰</summary><div class="menu-items"><button id="history">履歴</button><button id="flyers">店舗・チラシ</button><button id="settings">設定</button></div></details></header><nav id="tabs" aria-label="買い物予定日"></nav><nav id="storetabs" aria-label="購入予定店舗"></nav><div id="list"></div></main><footer><div><button id="add" class="primary">＋ 商品を追加</button></div></footer><div id="notice" role="status" hidden></div><dialog id="modal" aria-label="買い物メモの操作"></dialog><script>'use strict';
 const $=s=>document.querySelector(s);
 const key='shopping-memo-v1';
 const uid=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2);
@@ -154,7 +184,7 @@ function validate(v){
  if(!v.shops.every(s=>str(s.id)&&str(s.name)&&(s.url===undefined||!s.url||!!safeURL(s.url))&&(s.address===undefined||str(s.address))))throw Error('店舗');
  if(!v.items.every(i=>str(i.id)&&str(i.name)&&str(i.shop)&&validDate(i.date)&&validPrice(i.price)))throw Error('価格');
  if(!v.history.every(h=>str(h.id)&&str(h.name)&&str(h.shopName)&&validDate(h.date)&&validPrice(h.price)))throw Error('履歴');
- if(v.dailyMemos!==undefined&&(!Array.isArray(v.dailyMemos)||!v.dailyMemos.every(m=>str(m.id)&&str(m.name)&&validDate(m.date)&&str(m.shop)&&typeof m.done==='boolean'&&(m.note===undefined||typeof m.note==='string')&&(m.price===undefined||validPrice(m.price))&&(m.prices===undefined||(m.prices&&typeof m.prices==='object'&&!Array.isArray(m.prices)&&Object.values(m.prices).every(validPrice))))))throw Error('メモ');
+ if(v.dailyMemos!==undefined&&(!Array.isArray(v.dailyMemos)||!v.dailyMemos.every(m=>str(m.id)&&str(m.name)&&validDate(m.date)&&str(m.shop)&&typeof m.done==='boolean'&&(m.purchase===undefined||(m.purchase&&typeof m.purchase==='object'&&str(m.purchase.shop)&&str(m.purchase.shopName)&&validDate(m.purchase.date)&&validPrice(m.purchase.price)))&&(m.note===undefined||typeof m.note==='string')&&(m.price===undefined||validPrice(m.price))&&(m.prices===undefined||(m.prices&&typeof m.prices==='object'&&!Array.isArray(m.prices)&&Object.values(m.prices).every(validPrice))))))throw Error('メモ');
  if(v.memoDates!==undefined&&(!Array.isArray(v.memoDates)||!v.memoDates.every(validDate)))throw Error('日付');
  return v;
 }
@@ -171,7 +201,7 @@ if(!db.dailyMemos){
 db.memoDates=[...new Set([...(db.memoDates||[]),...db.dailyMemos.map(m=>m.date)])];
 if(!db.memoDates.length)db.memoDates=[today()];
 db.historyDays=90;
-let active=db.memoDates.includes(today())?today():db.memoDates[0],reordering=false,historyLimit=30;
+let active=db.memoDates.includes(today())?today():db.memoDates[0],storeFilter='all',historyLimit=30;
 function pruneHistory(){
  const cutoff=new Date(today()+'T12:00:00');cutoff.setDate(cutoff.getDate()-90);
  const boundary=cutoff.getFullYear()+'-'+String(cutoff.getMonth()+1).padStart(2,'0')+'-'+String(cutoff.getDate()).padStart(2,'0');
@@ -193,23 +223,92 @@ function actions(label='保存'){return '<div class="actions"><button type="butt
 function shopOptions(chosen,shops=db.shops){return shops.map(s=>'<option value="'+esc(s.id)+'" '+(s.id===chosen?'selected':'')+'>'+esc(s.name)+'</option>').join('')}
 function pageLink(url,text){const u=safeURL(url);return u?'<a class="link-button" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(text)+'</a>':''}
 let expanded=new Set();
+function purchaseFor(m){return m.purchase||db.history.find(h=>h.id===m.purchaseId)||null}
+function rowStore(m){const p=m.done?purchaseFor(m):null;return p?p.shop:(db.shops.some(s=>s.id===m.shop)?m.shop:'')}
+function rowChoice(m){const p=m.done?purchaseFor(m):null;return p?{shop:p.shop,name:p.shopName,price:p.price}:selected(m)}
+function dayItems(){return db.dailyMemos.filter(m=>m.date===active)}
+function visibleItems(){return dayItems().filter(m=>storeFilter==='all'||(storeFilter==='unset'?!rowStore(m):rowStore(m)===storeFilter))}
+function toast(s){$('#notice').textContent=s;$('#notice').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#notice').hidden=true,3200)}
 function render(){
- const ms=db.dailyMemos.filter(m=>m.date===active);
- $('#tabs').innerHTML=[...db.memoDates].sort().map(d=>'<button data-day="'+esc(d)+'" class="'+(d===active?'primary':'')+'">'+esc(d.slice(5).replace('-','/'))+'</button>').join('')+'<button id="newday">＋ 日付</button>';
- const allOpen=ms.length>0&&ms.every(m=>expanded.has(m.id));
- $('#list').innerHTML='<div class="list-tools"><span>'+ms.filter(m=>!m.done).length+' / '+ms.length+' 点 未購入</span><div><button id="allfold" '+(!ms.length?'disabled':'')+'>'+(allOpen?'一覧に戻す':'すべて開く')+'</button><button id="reorder" aria-pressed="'+reordering+'">'+(reordering?'並び替え完了':'並び替え')+'</button></div></div>'+(reordering?'<p class="small">↑ ↓ で買い物する順に並べられます。</p>':'')+(ms.length&&ms.every(m=>m.done)?'<button id="deleteday" class="danger delete-day">この日のメモを削除</button>':'')+
- (ms.map((m,index)=>{
-  const open=expanded.has(m.id),os=memoOffers(m),ps=os.filter(o=>o.price!==null).map(o=>o.price),min=ps.length?Math.min(...ps):null,chosen=selected(m);
-  return '<article class="memo-row '+(m.done?'done ':'')+(open?'is-open':'')+'"><div class="compact-row"><label class="check-hit"><input type="checkbox" data-check="'+esc(m.id)+'" aria-label="'+esc(m.name)+'を購入済みにする" '+(m.done?'checked':'')+'></label><button class="row-toggle" data-expand="'+esc(m.id)+'" aria-expanded="'+open+'" aria-controls="detail-'+esc(m.id)+'"><span class="row-name">'+esc(m.name)+'</span><span class="row-price"><strong>'+yen(chosen?.price??null)+'</strong><span class="row-shop">'+esc(chosen?.name||'購入先未選択')+'</span>'+(!open&&m.note?'<span class="note-preview">'+esc(m.note)+'</span>':'')+'</span><span class="chevron" aria-hidden="true">'+(open?'⌃':'⌄')+'</span></button></div>'+
-  (reordering?'<div class="actions reorder-actions"><span>'+(index+1)+'番目</span><button data-itemmove="'+esc(m.id)+'" data-step="-1" aria-label="'+esc(m.name)+'を上へ" '+(!index?'disabled':'')+'>↑</button><button data-itemmove="'+esc(m.id)+'" data-step="1" aria-label="'+esc(m.name)+'を下へ" '+(index===ms.length-1?'disabled':'')+'>↓</button></div>':'')+
-  '<div id="detail-'+esc(m.id)+'" class="row-detail" '+(!open?'hidden':'')+'>'+
-  (ps.length>1?'<div class="small compare-label">店舗の価格を比較</div>':'')+
-  '<div class="offers '+(os.length===1?'single':'')+'">'+os.map(o=>'<div class="offer-wrap"><button class="offer '+(o.shop===m.shop?'selected ':'')+(ps.length>1&&o.price===min?'best':'')+'" data-choose="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" '+(m.done?'disabled':'')+'><span>'+esc(o.name)+'</span><strong>'+yen(o.price)+'</strong><span class="badge">'+(o.shop===m.shop?'✓ ':'')+(ps.length>1&&o.price===min?'最安値':'')+'</span></button>'+(!m.done?'<button class="offer-edit" data-offeredit="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'">編集・削除</button>':'')+pageLink(o.url,'チラシ')+'</div>').join('')+'</div>'+
-  (m.note?'<div class="product-note"><span class="small block">メモ</span>'+esc(m.note)+'</div>':'')+
-  '<div class="detail-actions">'+(!m.done?'<button class="add-offer" data-offeradd="'+esc(m.id)+'">＋ 店舗の価格</button>':'')+'<button class="item-edit" data-edit="'+esc(m.id)+'">商品を編集</button></div></div></article>'
- }).join('')||'<div class="empty">この日の商品を追加しましょう</div>');
+ const all=dayItems(),storeNames=new Map(db.shops.map(s=>[s.id,s.name]));
+ for(const m of all){const p=m.done?purchaseFor(m):null;if(p&&!storeNames.has(p.shop))storeNames.set(p.shop,p.shopName+'（削除済み）')}
+ const ids=[...storeNames.keys()].filter(id=>all.some(m=>rowStore(m)===id));
+ if(storeFilter!=='all'&&storeFilter!=='unset'&&!storeNames.has(storeFilter))storeFilter='all';
+ const tabs=['all',...ids,...(all.some(m=>!rowStore(m))?['unset']:[])];
+ // Keep an empty active tab visible until the user leaves it after moving a product.
+ if(storeFilter!=='all'&&!tabs.includes(storeFilter))tabs.push(storeFilter);
+ $('#tabs').innerHTML=[...db.memoDates].sort().map(d=>'<button data-day="'+esc(d)+'" aria-pressed="'+(d===active)+'" class="'+(d===active?'primary':'')+'">'+esc(d.slice(5).replace('-','/'))+'</button>').join('')+'<button id="newday" aria-label="買い物の日付を追加">＋ 日付</button>';
+ $('#storetabs').innerHTML=tabs.map(id=>'<button data-store="'+esc(id)+'" aria-pressed="'+(storeFilter===id)+'">'+esc(id==='all'?'すべて':id==='unset'?'未設定':storeNames.get(id))+'</button>').join('');
+ const ms=visibleItems(),allOpen=ms.length&&ms.every(m=>expanded.has(m.id));
+ $('#list').innerHTML='<div class="list-tools"><span>'+ms.filter(m=>!m.done).length+' / '+ms.length+' 点 未購入</span><button id="allfold" '+(!ms.length?'disabled':'')+'>'+(allOpen?'一覧に戻す':'すべて開く')+'</button></div>'+(all.length&&all.every(m=>m.done)?'<div class="complete-day"><span>すべて購入済み</span><button id="deleteday">この日のメモを削除</button></div>':'')+
+ (ms.map(m=>{
+  const open=expanded.has(m.id),os=memoOffers(m),values=os.map(o=>o.price).filter(Number.isFinite),min=values.length?Math.min(...values):null,chosen=rowChoice(m);
+  return '<article class="memo-row '+(m.done?'done ':'')+(open?'is-open':'')+'"><div class="compact-row"><label class="check-hit"><input type="checkbox" data-check="'+esc(m.id)+'" aria-label="'+esc(m.name)+'を購入済みにする" '+(m.done?'checked':'')+'></label><button class="row-toggle" data-expand="'+esc(m.id)+'" aria-expanded="'+open+'" aria-controls="detail-'+esc(m.id)+'"><span class="row-name">'+esc(m.name)+'</span><span class="row-price"><strong>'+yen(chosen?.price??null)+'</strong>'+(storeFilter==='all'?'<span class="row-shop">'+esc(chosen?.name||'購入先未設定')+'</span>':'')+(!open&&m.note?'<span class="note-preview">'+esc(m.note)+'</span>':'')+'</span><span class="chevron" aria-hidden="true">'+(open?'⌃':'⌄')+'</span></button></div><div id="detail-'+esc(m.id)+'" class="row-detail" '+(!open?'hidden':'')+'><div class="compare-header"><span>店舗の価格を比較</span>'+(!m.done?'<button class="price-add" data-offeradd="'+esc(m.id)+'">＋ 店舗</button>':'')+'</div><div class="offers '+(os.length===1?'single':'')+'">'+os.map(o=>'<div class="offer-wrap"><div class="price-card '+(o.shop===(m.done?rowStore(m):m.shop)?'selected':'')+'"><button class="price-pick" data-choose="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" '+(m.done?'disabled':'')+'><span>'+esc(o.name)+'</span><strong>'+yen(o.price)+'</strong><span class="badge">'+(o.shop===(m.done?rowStore(m):m.shop)?'✓ '+(m.done?'購入時選択':'購入予定')+' ':'')+(values.length>1&&o.price===min?'最安値':'')+'</span></button>'+(!m.done?'<button class="price-pencil" data-offeredit="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" aria-label="'+esc(o.name)+'の価格を編集・削除">✎</button>':'')+'</div>'+pageLink(o.url,'チラシ')+'</div>').join('')+'</div><button class="memo-edit '+(!m.note?'empty-note':'')+'" data-note="'+esc(m.id)+'" aria-label="'+esc(m.name)+'のメモを編集"><span><span class="memo-label">メモ</span><span class="memo-text">'+esc(m.note||'メモを追加')+'</span></span><span aria-hidden="true">✎</span></button><div class="other-line"><button data-edit="'+esc(m.id)+'">⋯ その他の操作</button></div></div></article>'
+ }).join('')||'<div class="empty">'+(storeFilter==='all'?'この日の商品を追加しましょう':'この店舗の商品はありません')+'</div>');
  $('#add').disabled=loadError;
 }
+function noteEdit(m){
+ if(!m)return;
+ modal('<form id="noteform"><h2>'+esc(m.name)+'のメモ</h2><label>メモ<textarea name="note" maxlength="1000" rows="4" placeholder="容量、個数、クーポンなど">'+esc(m.note||'')+'</textarea></label>'+actions('メモを保存')+'</form>');
+ const f=$('#noteform');f.onsubmit=e=>{e.preventDefault();m.note=f.elements.namedItem('note').value.trim().slice(0,1000);close();save()};
+}
+function otherEdit(m){
+ if(!m)return;
+ modal('<form id="otherform"><h2>商品情報</h2><label>商品名<input name="name" required maxlength="100" value="'+esc(m.name)+'"></label><label>買い物予定日<input name="day" type="date" required value="'+esc(m.date)+'"></label><p class="small">価格は価格カードの鉛筆、メモはメモ欄から変更できます。商品名を変更しても購入履歴の記録は変わりません。</p>'+actions()+'<div class="actions"><button type="button" class="danger" data-deletememo="'+esc(m.id)+'">この商品をメモから削除</button></div></form>');
+ const f=$('#otherform');f.onsubmit=e=>{e.preventDefault();const name=f.elements.namedItem('name').value.trim(),day=f.elements.namedItem('day').value;if(!name||!validDate(day))return;m.name=name;m.date=day;if(!db.memoDates.includes(day))db.memoDates.push(day);active=day;close();save()};
+}
+const exactName=s=>String(s??'').trim();
+function edit(m){
+ if(m)return otherEdit(m);
+ modal('<form id="form" autocomplete="off"><h2>商品を追加</h2><div id="name-wrap"><label>商品名<input name="name" required maxlength="100" autocomplete="off"></label><div id="suggestions" class="suggestions" hidden></div></div><label>価格（円・空欄可）<input name="price" type="number" min="0" step="1" inputmode="numeric" placeholder="例：198"></label><label>商品メモ（任意）<textarea name="note" maxlength="1000" rows="3" placeholder="容量、個数、クーポンなど"></textarea></label><label>店舗<select name="shop"><option value="">後で決める</option>'+shopOptions(db.shops.some(s=>s.id===storeFilter)?storeFilter:'')+'</select></label><div id="formlinks"></div><label>買い物予定日<input name="day" type="date" required value="'+esc(active)+'"></label><div id="duplicateinfo" class="small" aria-live="polite"></div><div id="duplicateoptions" hidden><label class="separate-choice"><input name="separate" type="checkbox">別の商品・新しい購入分として追加</label><label id="targetlabel" hidden>追加先の商品<select name="target"></select></label></div><div class="actions"><button type="button" data-close>取消</button><button id="addsubmit" class="primary">商品を追加</button></div></form>');
+ const f=$('#form'),field=n=>f.elements.namedItem(n);
+ const matches=()=>db.dailyMemos.filter(x=>x.date===field('day').value&&exactName(x.name)===exactName(field('name').value));
+ function update(){
+  const list=matches(),separate=field('separate').checked,shop=field('shop').value;
+  $('#duplicateoptions').hidden=!list.length;$('#targetlabel').hidden=list.length<2||separate;
+  const previous=field('target').value;field('target').innerHTML=(list.length>1?'<option value="">追加先を選択</option>':'')+list.map(x=>'<option value="'+esc(x.id)+'">'+esc((selected(x)?.name||'店舗未設定')+'／'+(x.note||x.name)+(x.done?'（購入済み）':''))+'</option>').join('');
+  if(list.some(x=>x.id===previous))field('target').value=previous;
+  const target=list.length===1?list[0]:list.find(x=>x.id===field('target').value);
+  field('note').disabled=!!list.length&&!separate;
+  let text='',label='商品を追加';
+  if(list.length&&!separate){
+   if(!target)text='同名の商品があります。価格の追加先を選んでください。';
+   else if(target.done)text='この商品は購入済みです。新しい購入分は「別の商品・新しい購入分として追加」を選んでください。';
+   else if(!shop)text='登録済みの商品へ価格を追加するには店舗を選んでください。';
+   else if(Object.hasOwn(memoPrices(target),shop)){text='登録済みの価格 '+yen(memoPrices(target)[shop])+' → '+yen(field('price').value===''?null:Number(field('price').value))+' に更新します。購入先・メモは変えません。';label='価格を更新'}
+   else{text='登録済みの商品へ店舗価格を追加します。購入先・メモは変えません。';label='価格を追加'}
+  }
+  if(!shop&&field('price').value!=='')text='価格を保存するには店舗を選んでください。店舗未設定で追加する場合は価格を空欄にしてください。';
+  $('#duplicateinfo').textContent=text;$('#addsubmit').textContent=label;
+  $('#formlinks').innerHTML=pageLink(db.shops.find(s=>s.id===shop)?.url,'この店舗のチラシ・公式ページを開く');
+ }
+ attachSuggestions(field('name'));for(const n of ['name','price','shop','day','separate'])field(n).addEventListener(n==='name'||n==='price'?'input':'change',update);
+ field('target').addEventListener('change',update);$('#suggestions').addEventListener('click',update);update();
+ f.onsubmit=e=>{
+  e.preventDefault();const name=field('name').value.trim(),day=field('day').value,shop=field('shop').value,price=field('price').value===''?null:Number(field('price').value);
+  if(!name||!validDate(day)||!validPrice(price)||shop&&!db.shops.some(s=>s.id===shop))return;
+  if(!shop&&price!==null){update();return}
+  const list=matches();if(list.length&&!field('separate').checked){
+   const target=list.length===1?list[0]:list.find(x=>x.id===field('target').value);if(!target||target.done||!shop){update();return}
+   target.prices={...memoPrices(target),[shop]:price};if(target.shop===shop)target.price=price;
+  }else db.dailyMemos.push({id:uid(),name,date:day,shop,price:shop?price:null,prices:shop?{[shop]:price}:{},note:field('note').value.trim().slice(0,1000),done:false,createdAt:Date.now()});
+  if(!db.memoDates.includes(day))db.memoDates.push(day);active=day;close();save();
+ };
+}
+function uncheck(m){
+ // Unchecking a memo keeps its purchase history, including bulk uncheck.
+ m.done=false;
+}
+function setPurchased(m,done){
+ if(!done){uncheck(m);save();return true}
+ if(m.done)return true;
+ const o=selected(m);if(!o)return false;
+ const index=db.history.findIndex(h=>h.id===m.purchaseId),prior=db.history[index];
+ if(prior&&prior.shop===o.shop&&prior.price===o.price){m.purchase={...prior};m.done=true;save();return true}
+ m.purchaseId=prior?prior.id:uid();m.purchase={id:m.purchaseId,memoId:m.id,name:m.name,shop:o.shop,shopName:o.name,price:o.price,date:today(),time:Date.now()};m.done=true;
+ if(prior)db.history[index]={...m.purchase};else db.history.push({...m.purchase});save();return true;
+}
+
 function candidates(){const names=[...db.dailyMemos.map(m=>m.name),...db.history.slice().reverse().map(h=>h.name),...db.items.map(i=>i.name)],seen=new Set();return names.filter(n=>{const k=norm(n);if(!k||seen.has(k))return false;seen.add(k);return true})}
 function attachSuggestions(input){
  const panel=$('#suggestions');let matches=[];
@@ -218,24 +317,6 @@ function attachSuggestions(input){
  input.addEventListener('keydown',e=>{if(e.key==='Escape'){panel.hidden=true;e.stopPropagation()}});
  panel.addEventListener('click',e=>{const b=e.target.closest('[data-suggest]');if(!b)return;input.value=matches[Number(b.dataset.suggest)];panel.hidden=true});
  $('#form').addEventListener('focusout',e=>{if(!$('#name-wrap').contains(e.relatedTarget))panel.hidden=true});
-}
-function edit(m){
- if(!db.shops.length){alert('まず店舗を追加しましょう');shopEdit();return}
- if(m?.done){modal('<form id="noteform"><h2>購入済みの商品</h2><p>'+esc(m.name)+'</p><label>商品メモ（任意）<textarea name="note" maxlength="1000" rows="3" placeholder="容量、個数、クーポン、代替品など">'+esc(m.note||'')+'</textarea></label><p class="small">商品メモは購入済みでも変更できます。価格などを変更する場合は、一覧のチェックを外してください。</p>'+actions('メモを保存')+'<div class="actions"><button type="button" class="danger" data-deletememo="'+esc(m.id)+'">この商品をメモから削除</button></div></form>');$('#noteform').onsubmit=e=>{e.preventDefault();m.note=$('#noteform').elements.namedItem('note').value.trim().slice(0,1000);close();save()};return}
-
- modal('<form id="form" autocomplete="off"><h2>'+(m?'商品を編集':'商品を追加')+'</h2><div id="name-wrap"><label>商品名<input name="name" required maxlength="100" autocomplete="off" value="'+esc(m?.name||'')+'"></label><div id="suggestions" class="suggestions" hidden></div></div><label>価格（円・空欄可）<input name="price" type="number" min="0" step="1" inputmode="numeric" placeholder="例：198" value="'+(m?selected(m)?.price??'':'')+'"></label><label>商品メモ（任意）<textarea name="note" maxlength="1000" rows="3" placeholder="容量、個数、クーポン、代替品など">'+esc(m?.note||'')+'</textarea></label><label>店舗<select name="shop" '+(m&&db.shops.some(s=>s.id===m.shop)?'disabled':'')+'>'+shopOptions(m?.shop)+'</select></label><div id="formlinks"></div>'+(m?'<p class="small">別店舗の追加は、商品カードの「＋ 店舗の価格」からできます。</p>':'')+'<label>買い物予定日<input name="day" type="date" required value="'+esc(m?.date||active)+'"></label>'+actions()+(m?'<div class="actions"><button type="button" class="danger" data-deletememo="'+esc(m.id)+'">この商品をメモから削除</button></div>':'')+'</form>');
- const f=$('#form'),field=n=>f.elements.namedItem(n);attachSuggestions(field('name'));
- const storeLinks=$('#formlinks');
- const updateStoreLink=()=>{storeLinks.innerHTML=pageLink(db.shops.find(s=>s.id===field('shop').value)?.url,'この店舗のチラシ・公式ページを開く')};field('shop').onchange=updateStoreLink;updateStoreLink();
- f.onsubmit=e=>{
-  e.preventDefault();const name=field('name').value.trim(),day=field('day').value,shop=field('shop').value,price=field('price').value===''?null:Number(field('price').value);
-  if(!name||!validDate(day)||!validPrice(price))return;
-  if(!db.shops.some(s=>s.id===shop))return alert('店舗を選び直してください');
-  if(db.dailyMemos.some(x=>x!==m&&x.date===day&&norm(x.name)===norm(name)))return alert('同じ商品があります。商品カードの「＋ 店舗の価格」から追加してください。');
-  const prices={...(m?memoPrices(m):{}),[shop]:price},v={name,date:day,shop,price,prices,note:field('note').value.trim().slice(0,1000)};
-  if(m)Object.assign(m,v);else db.dailyMemos.push({...v,id:uid(),done:false});
-  if(!db.memoDates.includes(day))db.memoDates.push(day);active=day;close();save();
- };
 }
 function offerEdit(m,shop){
  if(!m||m.done)return;
@@ -249,10 +330,6 @@ function removeOffer(m,shop){
  if(!m||m.done||!Object.hasOwn(memoPrices(m),shop))return;
  if(!confirm('この商品から、この店舗の価格だけを削除しますか？ 他店舗の価格と購入履歴は残ります。'))return;
  const prices={...memoPrices(m)};delete prices[shop];m.prices=prices;if(m.shop===shop){m.shop=db.shops.find(s=>Object.hasOwn(prices,s.id))?.id||'';m.price=prices[m.shop]??null}close();save();
-}
-function moveMemo(id,step){
- const m=db.dailyMemos.find(m=>m.id===id);if(!m)return;const ms=db.dailyMemos.filter(x=>x.date===m.date),i=ms.indexOf(m),other=ms[i+step];if(!other)return;
- const a=db.dailyMemos.indexOf(m),b=db.dailyMemos.indexOf(other);[db.dailyMemos[a],db.dailyMemos[b]]=[db.dailyMemos[b],db.dailyMemos[a]];save();
 }
 function history(){
  pruneHistory();persist();
@@ -268,28 +345,28 @@ function shopEdit(shop,preset){
 }
 function shopLinks(){modal('<h2>店舗・チラシ</h2>'+db.shops.map(s=>'<section class="shop-info"><strong>'+esc(s.name)+'</strong><p class="small">'+esc(s.address||'')+'</p>'+pageLink(s.url,'チラシ・公式ページを開く')+(!safeURL(s.url)?'<p class="small">店舗情報でURLを登録できます</p>':'')+'<button data-shopedit="'+esc(s.id)+'">店舗情報</button></section>').join('')+'<button data-close>閉じる</button>')}
 function settings(){
- modal('<h2>設定</h2><button id="reset">この日のチェックを一括解除</button><h3>店舗管理</h3>'+db.shops.map((s,j)=>'<section class="shop-info"><strong>'+esc(s.name)+'</strong><p class="small">'+esc(s.address||'')+'</p><div class="actions">'+pageLink(s.url,'チラシ・公式ページ')+'<button data-shopedit="'+esc(s.id)+'">店舗情報</button><button data-shopmove="'+esc(s.id)+'" '+(!j?'disabled':'')+' aria-label="店舗を上へ">↑</button><button data-removeshop="'+esc(s.id)+'" class="danger">削除</button></div></section>').join('')+'<button id="newshop">＋ 店舗を追加</button><details class="presets"><summary>指定の2店舗の情報を登録する</summary><p class="small">既存の店舗を選ぶと、店舗を増やさずに公式URLを登録できます。</p>'+presets.map((p,i)=>'<button data-preset="'+i+'">'+esc(p.name)+'</button>').join('')+'</details><h3>購入履歴</h3><p class="small">保存期間：90日。期限を過ぎた履歴はアプリ起動時に自動削除します。日付メモは削除しません。</p><h3>データ管理</h3>'+(loadError?'<button id="rawexport">読み込めなかった元データを保存</button>':'')+'<div class="actions"><button id="export">バックアップ</button><button id="import">復元</button><input type="file" id="file" accept="application/json,.json" hidden></div><div class="actions"><button data-close>閉じる</button></div>');
+ modal('<h2>設定</h2><button id="reset">この日のチェックを一括解除</button><p class="small">購入履歴は残ります。同じ商品の再チェックでは対応する記録を再利用します。新しい買い物は別の日付メモに追加してください。</p><h3>店舗管理・訪問順</h3>'+db.shops.map((s,j)=>'<section class="shop-info"><strong>'+esc(s.name)+'</strong><p class="small">'+esc(s.address||'')+'</p><div class="actions">'+pageLink(s.url,'チラシ・公式ページ')+'<button data-shopedit="'+esc(s.id)+'">店舗情報</button><button data-shopmove="'+esc(s.id)+'" '+(!j?'disabled':'')+' aria-label="店舗を上へ">↑</button><button data-shopmove="'+esc(s.id)+'" data-step="1" '+(j===db.shops.length-1?'disabled':'')+' aria-label="店舗を下へ">↓</button><button data-removeshop="'+esc(s.id)+'" class="danger">削除</button></div></section>').join('')+'<button id="newshop">＋ 店舗を追加</button><details class="presets"><summary>指定の2店舗の情報を登録する</summary><p class="small">既存の店舗を選ぶと、店舗を増やさずに公式URLを登録できます。</p>'+presets.map((p,i)=>'<button data-preset="'+i+'">'+esc(p.name)+'</button>').join('')+'</details><h3>購入履歴</h3><p class="small">保存期間：90日。期限を過ぎた履歴はアプリ起動時に自動削除します。日付メモは削除しません。</p><h3>データ管理</h3>'+(loadError?'<button id="rawexport">読み込めなかった元データを保存</button>':'')+'<div class="actions"><button id="export">バックアップ</button><button id="import">復元</button><input type="file" id="file" accept="application/json,.json" hidden></div><div class="actions"><button data-close>閉じる</button></div>');
  $('#file').onchange=async e=>{if(!e.target.files[0])return;try{const v=validate(JSON.parse(await e.target.files[0].text()));if(!confirm('現在のデータを置き換えますか？ 復元した購入履歴も90日を過ぎた分は整理されます。'))return;localStorage.setItem('shopping-memo-before-restore',loadError?raw||'':JSON.stringify(db));localStorage.setItem(key,JSON.stringify(v));location.reload()}catch{alert('復元できませんでした。バックアップ形式と保存容量を確認してください。')}};
 }
 function presetEdit(index){const p=presets[index];if(!p)return;modal('<form id="presetform"><h2>'+esc(p.name)+'</h2><label>情報を登録する店舗<select name="target"><option value="">新しい店舗として追加</option>'+shopOptions('')+'</select></label><p class="small">既存の店舗を選ぶと、住所・URLを登録します。店舗名と価格は変更しません。</p>'+actions('次へ')+'</form>');const f=$('#presetform');f.onsubmit=e=>{e.preventDefault();const s=db.shops.find(s=>s.id===f.elements.namedItem('target').value);if(s)shopEdit(s,{...p});else shopEdit(null,p);if(s){const sf=$('#shopform');sf.elements.namedItem('url').value=p.url;if(!s.address)sf.elements.namedItem('address').value=p.address}}}
 function download(content,name){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-function newday(){modal('<form id="dayform"><h2>買い物の日付を追加</h2><label>買い物予定日<input name="day" type="date" required value="'+today()+'"></label>'+actions('追加')+'</form>');const f=$('#dayform');f.onsubmit=e=>{e.preventDefault();const day=f.elements.namedItem('day').value;if(!validDate(day))return;if(!db.memoDates.includes(day))db.memoDates.push(day);active=day;reordering=false;close();save()}}
+function newday(){modal('<form id="dayform"><h2>買い物の日付を追加</h2><label>買い物予定日<input name="day" type="date" required value="'+today()+'"></label>'+actions('追加')+'</form>');const f=$('#dayform');f.onsubmit=e=>{e.preventDefault();const day=f.elements.namedItem('day').value;if(!validDate(day))return;if(!db.memoDates.includes(day))db.memoDates.push(day);active=day;storeFilter='all';close();save()}}
 document.addEventListener('click',e=>{
- const b=e.target.closest('button');if(!b)return;if(['history','flyers','settings'].includes(b.id)&&$('#appmenu'))$('#appmenu').open=false;const d=b.dataset,m=db.dailyMemos.find(m=>m.id===(d.edit||d.deletememo||d.offeradd||d.offeredit||d.offerremove||d.choose));
- if(d.expand){expanded.has(d.expand)?expanded.delete(d.expand):expanded.add(d.expand);render()}else if(b.id==='allfold'){const ms=db.dailyMemos.filter(m=>m.date===active),all=ms.every(m=>expanded.has(m.id));ms.forEach(m=>all?expanded.delete(m.id):expanded.add(m.id));render()}else if('close'in d)close();
- else if(d.day){active=d.day;reordering=false;render()}
- else if(d.edit)edit(m);
+ const b=e.target.closest('button');if(!b)return;if(['history','flyers','settings'].includes(b.id)&&$('#appmenu'))$('#appmenu').open=false;const d=b.dataset,m=db.dailyMemos.find(m=>m.id===(d.note||d.edit||d.deletememo||d.offeradd||d.offeredit||d.offerremove||d.choose));
+ if(d.expand){expanded.has(d.expand)?expanded.delete(d.expand):expanded.add(d.expand);render()}else if(b.id==='allfold'){const ms=visibleItems(),all=ms.every(m=>expanded.has(m.id));ms.forEach(m=>all?expanded.delete(m.id):expanded.add(m.id));render()}else if('close'in d)close();
+ else if(d.day){active=d.day;storeFilter='all';render()}
+ else if('store'in d){storeFilter=d.store;render()}else if(d.note)noteEdit(m);else if(d.edit)otherEdit(m);
  else if(d.offeradd)offerEdit(m);
  else if(d.offeredit)offerEdit(m,d.shop);
  else if(d.offerremove)removeOffer(m,d.shop);
- else if(d.choose&&m&&!m.done){m.shop=d.shop;m.price=memoPrices(m)[d.shop]??null;save()}
- else if(d.itemmove)moveMemo(d.itemmove,Number(d.step));
+ else if(d.choose&&m&&!m.done){const old=m.shop;m.shop=d.shop;m.price=memoPrices(m)[d.shop]??null;save();if(storeFilter!=='all'&&old!==d.shop)toast('購入予定を'+(selected(m)?.name||'別店舗')+'へ変更しました')}
+ 
  else if(d.deletememo&&m&&confirm('この商品をこの日のメモから削除しますか？ 購入履歴は残ります。')){db.dailyMemos=db.dailyMemos.filter(x=>x!==m);close();save()}
  else if(d.shopedit)shopEdit(db.shops.find(s=>s.id===d.shopedit));
  else if(d.preset!==undefined)presetEdit(Number(d.preset));
- else if(d.shopmove){const i=db.shops.findIndex(s=>s.id===d.shopmove);if(i>0){[db.shops[i-1],db.shops[i]]=[db.shops[i],db.shops[i-1]];save();settings()}}
- else if(d.removeshop&&confirm('店舗と各メモのこの店舗の価格を削除しますか？ 購入履歴と商品メモは残ります。')){db.shops=db.shops.filter(s=>s.id!==d.removeshop);db.items=db.items.filter(i=>i.shop!==d.removeshop);db.dailyMemos.forEach(m=>{const ps={...memoPrices(m)};delete ps[d.removeshop];m.prices=ps;if(m.shop===d.removeshop){m.shop=Object.keys(ps)[0]||'';m.price=ps[m.shop]??null}});save();settings()}
- else if(d.undo&&confirm('この購入履歴を取り消しますか？ 該当メモが残っている場合は未購入に戻します。')){db.dailyMemos.forEach(m=>{if(m.purchaseId===d.undo){m.done=false;delete m.purchaseId}});removeHistory([d.undo]);history()}
+ else if(d.shopmove){const i=db.shops.findIndex(s=>s.id===d.shopmove),j=i+Number(d.step||-1);if(i>=0&&j>=0&&j<db.shops.length){[db.shops[i],db.shops[j]]=[db.shops[j],db.shops[i]];save();settings()}}
+ else if(d.removeshop&&confirm('店舗と各メモのこの店舗の価格を削除しますか？ 購入履歴と商品メモは残ります。')){db.shops=db.shops.filter(s=>s.id!==d.removeshop);db.items=db.items.filter(i=>i.shop!==d.removeshop);db.dailyMemos.forEach(m=>{if(m.done)return;const ps={...memoPrices(m)};delete ps[d.removeshop];m.prices=ps;if(m.shop===d.removeshop){m.shop=Object.keys(ps)[0]||'';m.price=ps[m.shop]??null}});save();settings()}
+ else if(d.undo&&confirm('この購入履歴を取り消しますか？ 該当メモが残っている場合は未購入に戻します。')){db.dailyMemos.forEach(m=>{if(m.purchaseId===d.undo){m.done=false;delete m.purchaseId;delete m.purchase}});removeHistory([d.undo]);history()}
  else if(d.historyday&&confirm('この日の購入履歴を削除しますか？ 商品メモの購入済みチェックは変えません。')){removeHistory(db.history.filter(h=>h.date===d.historyday).map(h=>h.id));history()}
  else if(b.id==='add')edit();
  else if(b.id==='settings')settings();
@@ -298,18 +375,16 @@ document.addEventListener('click',e=>{
  else if(b.id==='morehistory'){historyLimit+=30;history()}
  else if(b.id==='newshop')shopEdit();
  else if(b.id==='newday')newday();
- else if(b.id==='reorder'){reordering=!reordering;render()}
+ 
  else if(b.id==='deleteday'){const ms=db.dailyMemos.filter(m=>m.date===active);if(ms.length&&ms.every(m=>m.done)&&confirm('この日のメモを削除しますか？ 購入履歴は残ります。')){db.dailyMemos=db.dailyMemos.filter(m=>m.date!==active);db.memoDates=db.memoDates.filter(d=>d!==active);if(!db.memoDates.length)db.memoDates=[today()];active=db.memoDates[0];save()}}
- else if(b.id==='reset'){db.dailyMemos.filter(m=>m.date===active).forEach(m=>{m.done=false;delete m.purchaseId});close();save()}
+ else if(b.id==='reset'){db.dailyMemos.filter(m=>m.date===active).forEach(uncheck);close();save()}
  else if(b.id==='export')download(JSON.stringify(db),'shopping-memo-'+today()+'.json');
  else if(b.id==='rawexport')download(raw||'','shopping-memo-unreadable.json');
  else if(b.id==='import')$('#file').click();
 });
-document.addEventListener('change',e=>{
- const id=e.target.dataset.check;if(!id)return;const m=db.dailyMemos.find(m=>m.id===id);if(!m)return;const o=selected(m);
- if(e.target.checked&&!o){e.target.checked=false;alert('「＋ 店舗の価格」から購入先を追加してください');return}
- m.done=e.target.checked;if(m.done){m.purchaseId=uid();db.history.push({id:m.purchaseId,name:m.name,shop:o.shop,shopName:o.name,price:o.price,date:today(),time:Date.now()})}else delete m.purchaseId;save();
-});
+document.addEventListener('change',e=>{const id=e.target.dataset.check;if(!id)return;const m=db.dailyMemos.find(m=>m.id===id);if(!m)return;if(!setPurchased(m,e.target.checked)){e.target.checked=false;alert('購入する店舗を選んでください。商品を開いて「＋ 店舗」から追加できます。')}});
+// Preserve historical purchase snapshots before the existing history-retention pass.
+for(const m of db.dailyMemos){if(m.done&&!m.purchase){const h=db.history.find(h=>h.id===m.purchaseId);if(h)m.purchase={...h}}}
 if(!loadError){pruneHistory();persist()}
 render();
 if(loadError)alert('保存データを読み込めませんでした。上書きせず保持しています。設定から元データを保存できます。');
