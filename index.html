@@ -163,7 +163,54 @@ textarea:focus-visible{outline:3px solid #b57516;outline-offset:2px}
 #notice{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);width:max-content;max-width:90vw;background:#355d4b;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;z-index:5}
 #notice[hidden]{display:none}
 @media(max-width:360px){.price-pick strong{font-size:23px}.row-detail{padding-left:28px;padding-right:9px}#storetabs{gap:13px}}
-</style></head><body><main><header class="compact-header"><h1>買い物メモ<span class="version">店舗タブ版 v9</span></h1><details id="appmenu" class="app-menu"><summary aria-label="履歴・店舗・設定メニュー">☰</summary><div class="menu-items"><button id="history">履歴</button><button id="flyers">店舗・チラシ</button><button id="settings">設定</button></div></details></header><nav id="tabs" aria-label="買い物予定日"></nav><nav id="storetabs" aria-label="購入予定店舗"></nav><div id="list"></div></main><footer><div><button id="add" class="primary">＋ 商品を追加</button></div></footer><div id="notice" role="status" hidden></div><dialog id="modal" aria-label="買い物メモの操作"></dialog><script>'use strict';
+button,.link-button{white-space:nowrap;touch-action:manipulation}
+button:disabled{cursor:default}
+.menu-items{display:flex;flex-direction:column;align-items:stretch;gap:0;width:176px;max-width:calc(100vw - 32px);padding:6px}
+.menu-items button{width:100%;min-height:48px;text-align:left;padding:12px 16px;font-size:15px;border-radius:8px}
+.menu-items button+button{border-top:1px solid #edf0eb}
+.app-menu>summary{touch-action:manipulation;min-width:48px;min-height:48px}
+dialog{max-height:calc(100svh - 32px);padding:20px;scroll-padding:16px}
+dialog button,dialog a{white-space:nowrap}
+dialog .actions button{min-width:0}
+.store-list{margin-top:12px}
+.store-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;min-height:76px;border-bottom:1px solid var(--line);padding:8px 0}
+.store-open{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;width:100%;min-height:48px;text-align:left;padding:10px 4px;background:transparent;white-space:normal;font-weight:600}
+.store-open>span:first-child{min-width:0;overflow-wrap:anywhere;line-height:1.5}
+.store-chevron{flex:none;color:#8b9a8c;font-size:23px;font-weight:400}
+.order-controls{display:grid;grid-template-columns:44px 44px;gap:4px;flex:none}
+.order-controls button{width:44px;min-height:44px;padding:8px;line-height:1}
+.wide-action{display:block;width:100%;min-height:48px;text-align:center;white-space:normal;line-height:1.5}
+.store-add{margin-top:18px;white-space:nowrap}
+.section-caption{margin-top:-6px}
+.store-address{font-size:14px;line-height:1.7;overflow-wrap:anywhere;margin:0 0 16px;color:#64786a}
+.store-detail-actions{display:grid;gap:12px}
+.store-detail-actions .link-button{display:flex;min-height:48px;justify-content:center;white-space:normal;text-align:center}
+.store-delete-area{border-top:1px solid var(--line);margin-top:24px;padding-top:16px}
+.settings-section{padding:16px 0;border-bottom:1px solid var(--line)}
+.settings-section h3{margin:0 0 12px}
+.settings-section p{margin:9px 0 0}
+.backup-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.backup-actions button{min-height:48px;padding:10px 4px;font-size:14px}
+.quiet-action{background:transparent;text-decoration:underline;padding-left:0;font-size:13px;min-height:44px;margin-top:5px}
+.price-pencil{display:flex;align-items:center;justify-content:center;min-height:48px;min-width:48px;width:48px;height:48px;padding:12px;color:#52745c;background:transparent}
+.edit-icon{display:block;width:22px;height:22px;flex:none;pointer-events:none}
+.edit-mark{display:grid;place-items:center;flex:0 0 44px;min-width:44px;min-height:44px;color:#52745c!important}
+.memo-edit{align-items:center;gap:4px;padding:8px 4px 8px 12px;margin-top:8px;min-height:60px}
+.memo-edit>span:first-child{padding:3px 0}
+.memo-edit.empty-note{background:#f4f5ef}
+.memo-label{margin-bottom:4px}
+.row-detail .offers{margin-top:0;margin-bottom:0;gap:8px}
+.offer-wrap{display:block}
+.price-pick{min-height:104px;gap:6px;padding:10px;white-space:normal;min-width:0}
+.price-pick>span:first-child{padding-right:30px;min-height:24px;line-height:1.45}
+.price-pick strong{font-size:25px;line-height:1.25}
+.compare-header{min-height:44px}
+.compare-header .price-add{background:transparent;white-space:nowrap}
+.other-line{margin-top:12px;padding-top:4px}
+#suggestions button{min-height:48px;touch-action:manipulation;white-space:normal}
+#name-wrap{position:relative}
+@media(max-width:360px){dialog{padding:16px}.store-row{gap:4px}.order-controls{gap:2px;grid-template-columns:44px 44px}.store-open{font-size:15px}.price-pick strong{font-size:23px}.backup-actions{gap:8px}.price-pencil{padding:12px}}
+</style></head><body><main><header class="compact-header"><h1>買い物メモ<span class="version">操作改善版 v10</span></h1><details id="appmenu" class="app-menu"><summary aria-label="履歴・店舗・設定メニュー">☰</summary><div class="menu-items"><button id="history">履歴</button><button id="flyers">店舗</button><button id="settings">設定</button></div></details></header><nav id="tabs" aria-label="買い物予定日"></nav><nav id="storetabs" aria-label="購入予定店舗"></nav><div id="list"></div></main><footer><div><button id="add" class="primary">＋ 商品を追加</button></div></footer><div id="notice" role="status" hidden></div><dialog id="modal" aria-label="買い物メモの操作"></dialog><script>'use strict';
 const $=s=>document.querySelector(s);
 const key='shopping-memo-v1';
 const uid=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2);
@@ -243,7 +290,7 @@ function render(){
  $('#list').innerHTML='<div class="list-tools"><span>'+ms.filter(m=>!m.done).length+' / '+ms.length+' 点 未購入</span><button id="allfold" '+(!ms.length?'disabled':'')+'>'+(allOpen?'一覧に戻す':'すべて開く')+'</button></div>'+(all.length&&all.every(m=>m.done)?'<div class="complete-day"><span>すべて購入済み</span><button id="deleteday">この日のメモを削除</button></div>':'')+
  (ms.map(m=>{
   const open=expanded.has(m.id),os=memoOffers(m),values=os.map(o=>o.price).filter(Number.isFinite),min=values.length?Math.min(...values):null,chosen=rowChoice(m);
-  return '<article class="memo-row '+(m.done?'done ':'')+(open?'is-open':'')+'"><div class="compact-row"><label class="check-hit"><input type="checkbox" data-check="'+esc(m.id)+'" aria-label="'+esc(m.name)+'を購入済みにする" '+(m.done?'checked':'')+'></label><button class="row-toggle" data-expand="'+esc(m.id)+'" aria-expanded="'+open+'" aria-controls="detail-'+esc(m.id)+'"><span class="row-name">'+esc(m.name)+'</span><span class="row-price"><strong>'+yen(chosen?.price??null)+'</strong>'+(storeFilter==='all'?'<span class="row-shop">'+esc(chosen?.name||'購入先未設定')+'</span>':'')+(!open&&m.note?'<span class="note-preview">'+esc(m.note)+'</span>':'')+'</span><span class="chevron" aria-hidden="true">'+(open?'⌃':'⌄')+'</span></button></div><div id="detail-'+esc(m.id)+'" class="row-detail" '+(!open?'hidden':'')+'><div class="compare-header"><span>店舗の価格を比較</span>'+(!m.done?'<button class="price-add" data-offeradd="'+esc(m.id)+'">＋ 店舗</button>':'')+'</div><div class="offers '+(os.length===1?'single':'')+'">'+os.map(o=>'<div class="offer-wrap"><div class="price-card '+(o.shop===(m.done?rowStore(m):m.shop)?'selected':'')+'"><button class="price-pick" data-choose="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" '+(m.done?'disabled':'')+'><span>'+esc(o.name)+'</span><strong>'+yen(o.price)+'</strong><span class="badge">'+(o.shop===(m.done?rowStore(m):m.shop)?'✓ '+(m.done?'購入時選択':'購入予定')+' ':'')+(values.length>1&&o.price===min?'最安値':'')+'</span></button>'+(!m.done?'<button class="price-pencil" data-offeredit="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" aria-label="'+esc(o.name)+'の価格を編集・削除">✎</button>':'')+'</div>'+pageLink(o.url,'チラシ')+'</div>').join('')+'</div><button class="memo-edit '+(!m.note?'empty-note':'')+'" data-note="'+esc(m.id)+'" aria-label="'+esc(m.name)+'のメモを編集"><span><span class="memo-label">メモ</span><span class="memo-text">'+esc(m.note||'メモを追加')+'</span></span><span aria-hidden="true">✎</span></button><div class="other-line"><button data-edit="'+esc(m.id)+'">⋯ その他の操作</button></div></div></article>'
+  return '<article class="memo-row '+(m.done?'done ':'')+(open?'is-open':'')+'"><div class="compact-row"><label class="check-hit"><input type="checkbox" data-check="'+esc(m.id)+'" aria-label="'+esc(m.name)+'を購入済みにする" '+(m.done?'checked':'')+'></label><button class="row-toggle" data-expand="'+esc(m.id)+'" aria-expanded="'+open+'" aria-controls="detail-'+esc(m.id)+'"><span class="row-name">'+esc(m.name)+'</span><span class="row-price"><strong>'+yen(chosen?.price??null)+'</strong>'+(storeFilter==='all'?'<span class="row-shop">'+esc(chosen?.name||'購入先未設定')+'</span>':'')+(!open&&m.note?'<span class="note-preview">'+esc(m.note)+'</span>':'')+'</span><span class="chevron" aria-hidden="true">'+(open?'⌃':'⌄')+'</span></button></div><div id="detail-'+esc(m.id)+'" class="row-detail" '+(!open?'hidden':'')+'><div class="compare-header"><span>店舗の価格を比較</span>'+(!m.done?'<button class="price-add" data-offeradd="'+esc(m.id)+'">＋ 店舗</button>':'')+'</div><div class="offers '+(os.length===1?'single':'')+'">'+os.map(o=>'<div class="offer-wrap"><div class="price-card '+(o.shop===(m.done?rowStore(m):m.shop)?'selected':'')+'"><button class="price-pick" data-choose="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" '+(m.done?'disabled':'')+'><span>'+esc(o.name)+'</span><strong>'+yen(o.price)+'</strong><span class="badge">'+(o.shop===(m.done?rowStore(m):m.shop)?'✓ '+(m.done?'購入時選択':'購入予定')+' ':'')+(values.length>1&&o.price===min?'最安値':'')+'</span></button>'+(!m.done?'<button class="price-pencil" data-offeredit="'+esc(m.id)+'" data-shop="'+esc(o.shop)+'" aria-label="'+esc(o.name)+'の価格を編集・削除">'+pencilIcon()+'</button>':'')+'</div></div>').join('')+'</div><button class="memo-edit '+(!m.note?'empty-note':'')+'" data-note="'+esc(m.id)+'" aria-label="'+esc(m.name)+'のメモを編集"><span><span class="memo-label">メモ</span><span class="memo-text">'+esc(m.note||'メモを追加')+'</span></span><span class="edit-mark" aria-hidden="true">'+pencilIcon()+'</span></button><div class="other-line"><button data-edit="'+esc(m.id)+'">⋯ その他の操作</button></div></div></article>'
  }).join('')||'<div class="empty">'+(storeFilter==='all'?'この日の商品を追加しましょう':'この店舗の商品はありません')+'</div>');
  $('#add').disabled=loadError;
 }
@@ -310,14 +357,34 @@ function setPurchased(m,done){
 }
 
 function candidates(){const names=[...db.dailyMemos.map(m=>m.name),...db.history.slice().reverse().map(h=>h.name),...db.items.map(i=>i.name)],seen=new Set();return names.filter(n=>{const k=norm(n);if(!k||seen.has(k))return false;seen.add(k);return true})}
+function pencilIcon(){return '<svg class="edit-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15z"/></svg>'}
 function attachSuggestions(input){
- const panel=$('#suggestions');let matches=[];
+ const panel=$('#suggestions'),wrap=$('#name-wrap');let matches=[],press=null,lastPointerSelection=0;
  const show=()=>{const q=norm(input.value);matches=candidates().filter(n=>!q||norm(n).includes(q)).slice(0,6);panel.innerHTML=matches.length?'<div class="small">過去の商品名（価格は引き継ぎません）</div>'+matches.map((n,i)=>'<button type="button" data-suggest="'+i+'">'+esc(n)+'</button>').join(''):'';panel.hidden=!matches.length};
+ const choose=index=>{const name=matches[Number(index)];if(name===undefined)return;input.value=name;input.dispatchEvent(new Event('input',{bubbles:true}));panel.hidden=true};
  input.addEventListener('focus',show);input.addEventListener('input',show);
  input.addEventListener('keydown',e=>{if(e.key==='Escape'){panel.hidden=true;e.stopPropagation()}});
- panel.addEventListener('click',e=>{const b=e.target.closest('[data-suggest]');if(!b)return;input.value=matches[Number(b.dataset.suggest)];panel.hidden=true});
- $('#form').addEventListener('focusout',e=>{if(!$('#name-wrap').contains(e.relatedTarget))panel.hidden=true});
+ panel.addEventListener('pointerdown',e=>{const b=e.target.closest('[data-suggest]');if(!b||e.button>0)return;press={index:b.dataset.suggest,x:e.clientX,y:e.clientY,id:e.pointerId};e.preventDefault()});
+ panel.addEventListener('pointerup',e=>{if(!press||press.id!==e.pointerId)return;const p=press;press=null;if(Math.hypot(e.clientX-p.x,e.clientY-p.y)>12)return;lastPointerSelection=Date.now();choose(p.index)});
+ panel.addEventListener('pointercancel',()=>press=null);
+ panel.addEventListener('click',e=>{const b=e.target.closest('[data-suggest]');if(!b)return;if(e.detail>0&&Date.now()-lastPointerSelection<500)return;choose(b.dataset.suggest)});
+ $('#form').addEventListener('focusout',e=>{if(wrap.contains(e.relatedTarget)||press)return;setTimeout(()=>{if(!press&&!wrap.contains(document.activeElement))panel.hidden=true},0)});
 }
+function storesView(){
+ modal('<h2>店舗</h2><p class="small section-caption">訪問する順に並べられます</p><div class="store-list">'+db.shops.map((s,j)=>'<section class="store-row"><button class="store-open" data-shopdetail="'+esc(s.id)+'"><span>'+esc(s.name)+'</span><span class="store-chevron" aria-hidden="true">›</span></button><div class="order-controls"><button data-shopmove="'+esc(s.id)+'" data-step="-1" aria-label="'+esc(s.name)+'を上へ" '+(!j?'disabled':'')+'>↑</button><button data-shopmove="'+esc(s.id)+'" data-step="1" aria-label="'+esc(s.name)+'を下へ" '+(j===db.shops.length-1?'disabled':'')+'>↓</button></div></section>').join('')+'</div>'+(!db.shops.length?'<p class="small">店舗を追加すると、価格を比較できます。</p>':'')+'<button id="newshop" class="wide-action store-add">＋ 店舗を追加</button><details class="presets"><summary>指定の2店舗の情報を登録</summary>'+presets.map((p,i)=>'<button data-preset="'+i+'">'+esc(p.name)+'</button>').join('')+'</details><div class="actions"><button data-close>閉じる</button></div>');
+}
+function shopLinks(){storesView()}
+function storeDetail(s){
+ if(!s)return;
+ modal('<h2>'+esc(s.name)+'</h2>'+(s.address?'<p class="store-address">'+esc(s.address)+'</p>':'')+'<div class="store-detail-actions">'+pageLink(s.url,'チラシ・公式ページを開く')+(!safeURL(s.url)?'<p class="small">店舗情報の編集でURLを登録できます。</p>':'')+'<button data-shopedit="'+esc(s.id)+'" class="wide-action">店舗情報を編集</button></div><div class="store-delete-area"><button data-removeshop="'+esc(s.id)+'" class="danger wide-action">この店舗を削除</button></div><div class="actions"><button id="storesback">店舗一覧に戻る</button><button data-close>閉じる</button></div>');
+}
+function settings(){
+ modal('<h2>設定</h2><section class="settings-section"><h3>買い物メモ</h3><button id="reset" class="wide-action">この日のチェックを一括解除</button><p class="small">購入履歴は残ります。再チェックでは対応する記録を再利用します。</p></section><section class="settings-section"><h3>バックアップ</h3><div class="backup-actions"><button id="export">データを保存</button><button id="import">データを復元</button></div><input type="file" id="file" accept="application/json,.json" hidden>'+(loadError?'<button id="rawexport" class="wide-action">読み込めなかった元データを保存</button>':'')+'</section><section class="settings-section"><h3>購入履歴</h3><p class="small">保存期間は90日です。期限を過ぎた履歴は起動時に整理します。</p><button id="settingshistory" class="quiet-action">購入履歴を開く</button></section><div class="actions"><button data-close>閉じる</button></div>');
+ $('#file').onchange=async e=>{if(!e.target.files[0])return;try{const v=validate(JSON.parse(await e.target.files[0].text()));if(!confirm('現在のデータを置き換えますか？ 復元した購入履歴も90日を過ぎた分は整理されます。'))return;localStorage.setItem('shopping-memo-before-restore',loadError?raw||'':JSON.stringify(db));localStorage.setItem(key,JSON.stringify(v));location.reload()}catch{alert('復元できませんでした。バックアップ形式と保存容量を確認してください。')}};
+}
+document.addEventListener('pointerdown',e=>{const menu=$('#appmenu');if(menu?.open&&!menu.contains(e.target))menu.open=false});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#appmenu'))$('#appmenu').open=false});
+
 function offerEdit(m,shop){
  if(!m||m.done)return;
  const ps=memoPrices(m),editing=shop!==undefined,available=editing?db.shops.filter(s=>s.id===shop):db.shops.filter(s=>!Object.hasOwn(ps,s.id));
@@ -341,12 +408,7 @@ function removeHistory(ids){const set=new Set(ids);db.history=db.history.filter(
 function shopEdit(shop,preset){
  const initial=shop||preset||{name:'',address:'',url:''};
  modal('<form id="shopform" autocomplete="off"><h2>'+(shop?'店舗情報を編集':'店舗を追加')+'</h2><label>店舗名・支店名<input name="name" required maxlength="100" placeholder="例：ライフ 葛飾鎌倉店" value="'+esc(initial.name)+'"></label><label>住所・メモ（任意）<input name="address" maxlength="300" value="'+esc(initial.address||'')+'"></label><label>公式店舗・チラシURL（任意）<input name="url" type="url" inputmode="url" placeholder="https://…" value="'+esc(initial.url||'')+'"></label><p class="small">登録したページを別画面で開き、チラシを見ながら価格を入力できます。価格の自動取り込みは行いません。</p>'+actions(shop?'保存':'店舗を追加')+'</form>');
- const f=$('#shopform');f.onsubmit=e=>{e.preventDefault();const name=f.elements.namedItem('name').value.trim(),address=f.elements.namedItem('address').value.trim(),rawURL=f.elements.namedItem('url').value.trim(),url=safeURL(rawURL);if(!name)return;if(rawURL&&!url)return alert('http:// または https:// から始まるURLを入力してください');if(shop)Object.assign(shop,{name,address,url});else db.shops.push({id:uid(),name,address,url});close();save();settings()};
-}
-function shopLinks(){modal('<h2>店舗・チラシ</h2>'+db.shops.map(s=>'<section class="shop-info"><strong>'+esc(s.name)+'</strong><p class="small">'+esc(s.address||'')+'</p>'+pageLink(s.url,'チラシ・公式ページを開く')+(!safeURL(s.url)?'<p class="small">店舗情報でURLを登録できます</p>':'')+'<button data-shopedit="'+esc(s.id)+'">店舗情報</button></section>').join('')+'<button data-close>閉じる</button>')}
-function settings(){
- modal('<h2>設定</h2><button id="reset">この日のチェックを一括解除</button><p class="small">購入履歴は残ります。同じ商品の再チェックでは対応する記録を再利用します。新しい買い物は別の日付メモに追加してください。</p><h3>店舗管理・訪問順</h3>'+db.shops.map((s,j)=>'<section class="shop-info"><strong>'+esc(s.name)+'</strong><p class="small">'+esc(s.address||'')+'</p><div class="actions">'+pageLink(s.url,'チラシ・公式ページ')+'<button data-shopedit="'+esc(s.id)+'">店舗情報</button><button data-shopmove="'+esc(s.id)+'" '+(!j?'disabled':'')+' aria-label="店舗を上へ">↑</button><button data-shopmove="'+esc(s.id)+'" data-step="1" '+(j===db.shops.length-1?'disabled':'')+' aria-label="店舗を下へ">↓</button><button data-removeshop="'+esc(s.id)+'" class="danger">削除</button></div></section>').join('')+'<button id="newshop">＋ 店舗を追加</button><details class="presets"><summary>指定の2店舗の情報を登録する</summary><p class="small">既存の店舗を選ぶと、店舗を増やさずに公式URLを登録できます。</p>'+presets.map((p,i)=>'<button data-preset="'+i+'">'+esc(p.name)+'</button>').join('')+'</details><h3>購入履歴</h3><p class="small">保存期間：90日。期限を過ぎた履歴はアプリ起動時に自動削除します。日付メモは削除しません。</p><h3>データ管理</h3>'+(loadError?'<button id="rawexport">読み込めなかった元データを保存</button>':'')+'<div class="actions"><button id="export">バックアップ</button><button id="import">復元</button><input type="file" id="file" accept="application/json,.json" hidden></div><div class="actions"><button data-close>閉じる</button></div>');
- $('#file').onchange=async e=>{if(!e.target.files[0])return;try{const v=validate(JSON.parse(await e.target.files[0].text()));if(!confirm('現在のデータを置き換えますか？ 復元した購入履歴も90日を過ぎた分は整理されます。'))return;localStorage.setItem('shopping-memo-before-restore',loadError?raw||'':JSON.stringify(db));localStorage.setItem(key,JSON.stringify(v));location.reload()}catch{alert('復元できませんでした。バックアップ形式と保存容量を確認してください。')}};
+ const f=$('#shopform');f.onsubmit=e=>{e.preventDefault();const name=f.elements.namedItem('name').value.trim(),address=f.elements.namedItem('address').value.trim(),rawURL=f.elements.namedItem('url').value.trim(),url=safeURL(rawURL);if(!name)return;if(rawURL&&!url)return alert('http:// または https:// から始まるURLを入力してください');if(shop)Object.assign(shop,{name,address,url});else db.shops.push({id:uid(),name,address,url});close();save();storesView()};
 }
 function presetEdit(index){const p=presets[index];if(!p)return;modal('<form id="presetform"><h2>'+esc(p.name)+'</h2><label>情報を登録する店舗<select name="target"><option value="">新しい店舗として追加</option>'+shopOptions('')+'</select></label><p class="small">既存の店舗を選ぶと、住所・URLを登録します。店舗名と価格は変更しません。</p>'+actions('次へ')+'</form>');const f=$('#presetform');f.onsubmit=e=>{e.preventDefault();const s=db.shops.find(s=>s.id===f.elements.namedItem('target').value);if(s)shopEdit(s,{...p});else shopEdit(null,p);if(s){const sf=$('#shopform');sf.elements.namedItem('url').value=p.url;if(!s.address)sf.elements.namedItem('address').value=p.address}}}
 function download(content,name){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
@@ -362,15 +424,15 @@ document.addEventListener('click',e=>{
  else if(d.choose&&m&&!m.done){const old=m.shop;m.shop=d.shop;m.price=memoPrices(m)[d.shop]??null;save();if(storeFilter!=='all'&&old!==d.shop)toast('購入予定を'+(selected(m)?.name||'別店舗')+'へ変更しました')}
  
  else if(d.deletememo&&m&&confirm('この商品をこの日のメモから削除しますか？ 購入履歴は残ります。')){db.dailyMemos=db.dailyMemos.filter(x=>x!==m);close();save()}
- else if(d.shopedit)shopEdit(db.shops.find(s=>s.id===d.shopedit));
+ else if(d.shopdetail)storeDetail(db.shops.find(s=>s.id===d.shopdetail));else if(d.shopedit)shopEdit(db.shops.find(s=>s.id===d.shopedit));
  else if(d.preset!==undefined)presetEdit(Number(d.preset));
- else if(d.shopmove){const i=db.shops.findIndex(s=>s.id===d.shopmove),j=i+Number(d.step||-1);if(i>=0&&j>=0&&j<db.shops.length){[db.shops[i],db.shops[j]]=[db.shops[j],db.shops[i]];save();settings()}}
- else if(d.removeshop&&confirm('店舗と各メモのこの店舗の価格を削除しますか？ 購入履歴と商品メモは残ります。')){db.shops=db.shops.filter(s=>s.id!==d.removeshop);db.items=db.items.filter(i=>i.shop!==d.removeshop);db.dailyMemos.forEach(m=>{if(m.done)return;const ps={...memoPrices(m)};delete ps[d.removeshop];m.prices=ps;if(m.shop===d.removeshop){m.shop=Object.keys(ps)[0]||'';m.price=ps[m.shop]??null}});save();settings()}
+ else if(d.shopmove){const i=db.shops.findIndex(s=>s.id===d.shopmove),j=i+Number(d.step||-1);if(i>=0&&j>=0&&j<db.shops.length){[db.shops[i],db.shops[j]]=[db.shops[j],db.shops[i]];save();storesView()}}
+ else if(d.removeshop&&confirm('店舗と各メモのこの店舗の価格を削除しますか？ 購入履歴と商品メモは残ります。')){db.shops=db.shops.filter(s=>s.id!==d.removeshop);db.items=db.items.filter(i=>i.shop!==d.removeshop);db.dailyMemos.forEach(m=>{if(m.done)return;const ps={...memoPrices(m)};delete ps[d.removeshop];m.prices=ps;if(m.shop===d.removeshop){m.shop=Object.keys(ps)[0]||'';m.price=ps[m.shop]??null}});save();storesView()}
  else if(d.undo&&confirm('この購入履歴を取り消しますか？ 該当メモが残っている場合は未購入に戻します。')){db.dailyMemos.forEach(m=>{if(m.purchaseId===d.undo){m.done=false;delete m.purchaseId;delete m.purchase}});removeHistory([d.undo]);history()}
  else if(d.historyday&&confirm('この日の購入履歴を削除しますか？ 商品メモの購入済みチェックは変えません。')){removeHistory(db.history.filter(h=>h.date===d.historyday).map(h=>h.id));history()}
  else if(b.id==='add')edit();
  else if(b.id==='settings')settings();
- else if(b.id==='flyers')shopLinks();
+ else if(b.id==='flyers'||b.id==='storesback')storesView();else if(b.id==='settingshistory'){historyLimit=30;history()}
  else if(b.id==='history'){historyLimit=30;history()}
  else if(b.id==='morehistory'){historyLimit+=30;history()}
  else if(b.id==='newshop')shopEdit();
